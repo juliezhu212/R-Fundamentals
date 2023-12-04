@@ -57,9 +57,20 @@ You can write **text** directly into a notebook, as you would a Word Document. T
 
 1\. Click Insert --\> Code chunk --\> R
 
+``` r
+```
+
 2\. Use the keyboard shortcut **Ctrl + Alt + I** (windows) or **Cmd + Option + I** (mac) (I = the letter "i")
 
+```{r}
+
+```
+
 3\. [for newer versions of R] Type **/** (forward slash) and a drop down menu should appear. Select R Code Chunk
+
+```{r}
+
+```
 
 You can run code inside a code chunk in two ways:
 
@@ -72,6 +83,8 @@ You can run code inside a code chunk in two ways:
 
 # You can use R like a giant calculator! 
 2 + 3
+
+3 + 4
 ```
 
 💡 **Tip:** Writing **comments** about your code is very important. The best practice is to write **why** you are doing something, not just **what** you are doing.
@@ -79,6 +92,38 @@ You can run code inside a code chunk in two ways:
 ### 🥊 Challenge 1: Create and Run a Chunk of Code
 
 Use the two methods above to create a chunk of code. In the chunk, experiment with writing and running some math. Remember to comment your code.
+
+```{r}
+
+# Subtraction
+10 - 10
+
+# Addition
+1 + 6
+
+# Division
+2 / 10
+
+# Multiplication
+1 * 100
+
+# Power
+2 ^ 3
+
+# And
+1 & 2
+1 && 2
+
+# Or
+1 | 2
+1 || 2
+
+# Equality
+1 == 1
+
+# Inequality
+2 != 1
+```
 
 💡 **Tip:** You can save this notebook with your answers to the challenges and any notes you take throughout the workshop. Click the 💾 icon in the toolbar or select File --\> Save.
 
@@ -104,6 +149,9 @@ Variables are objects that hold values. Variables can be inside data sets (like 
 # a variable that gives the year 
 year <- 2023
 
+# preferred for function arguments
+year = 2024
+
 # print out the value
 year
 ```
@@ -121,7 +169,6 @@ country <- "Mexico"
 
 # assign a numeric value to the variable lifeexp
 lifeexp <- 76.2
-
 ```
 
 ⚠️ **Warning**: We will talk about different types of variables (numeric, characters, categorical) in Part 2.
@@ -131,9 +178,11 @@ lifeexp <- 76.2
 Create a variable called `continent` and assign it the value "Americas". Create a variable called `pop` and assign it the value 4.5.
 
 ```{r}
+continent <- "Americas"
 
+pop <- 4.5
 
-
+name <- "Julie"
 ```
 
 All variables created show up in the Global Environment (top right panel).
@@ -154,7 +203,7 @@ rm(name)
 rm(list = ls())
 ```
 
-⚠️ **Warning**:  You cannot undo removing a variable. You must instead re-create the variable.
+⚠️ **Warning**: You cannot undo removing a variable. You must instead re-create the variable.
 
 If you want to rename a variable, the easiest thing to do is create a variable with the new name and remove the old variable.
 
@@ -179,7 +228,7 @@ ls()
 
 ### 🥊 Challenge 3: Creating Variables from Other Variables
 
-Pick a country. Look up its population and create a variable which stores the population. Now look up the GDP (Gross Domestic Product) and create another variable which stores the GDP. 
+Pick a country. Look up its population and create a variable which stores the population. Now look up the GDP (Gross Domestic Product) and create another variable which stores the GDP.
 
 Can you use these two variables to create a third variable which stores the GDP per capita (GDP divided by population)?
 
