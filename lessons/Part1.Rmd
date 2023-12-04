@@ -233,9 +233,13 @@ Pick a country. Look up its population and create a variable which stores the po
 Can you use these two variables to create a third variable which stores the GDP per capita (GDP divided by population)?
 
 ```{r}
+pop <- 333287557
 
+# Scientific Notation: 25.46e+12
+gdp <- 25.46 * 10^12
 
-
+gdp_per_capita <- gdp / pop
+gdp_per_capita
 ```
 
 ## Creating Vectors
@@ -259,6 +263,11 @@ pop_mexico <- c(123, 124, 125, 126, 127)
 pop_mexico
 ```
 
+```{r}
+# first element has index 1 (different from Python)
+pop_mexico[1]
+```
+
 If we do something to the values in a vector, R applies that operation to each item in the vector.
 
 ```{r}
@@ -279,14 +288,11 @@ Most of the time, you won't be working with single value variables or vectors. I
 # read in data
 gap <- read.csv(file = "../data/gapminder.csv")
 head(gap)
-
 ```
 
 ```{r}
 # subset data
 gap[gap$country == "Mexico", c("country", "year", "pop")] 
-
-
 ```
 
 ## Key Points
