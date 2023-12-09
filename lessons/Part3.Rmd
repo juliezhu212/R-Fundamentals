@@ -31,7 +31,7 @@ Before we get started, let's load in the `tidyverse` package that we used in Par
 
 ```{r}
 # if you haven't installed tidyverse before, uncomment this line 
-#install.packages("tidyverse")
+# install.packages("tidyverse")
 
 # if you have previously installed tidyverse, load it into the current R session
 library(tidyverse)
@@ -39,7 +39,7 @@ library(tidyverse)
 
 ## Tidyverse
 
-In Part 2, we learned how to subset columns in **base R**. Base R refers to all the functions and operators that you can use in R without installing any additional packages. Base R will get you a long way in data science. However, it is not always the easiest code to read and interpret. 
+In Part 2, we learned how to subset columns in **base R**. Base R refers to all the functions and operators that you can use in R without installing any additional packages. Base R will get you a long way in data science. However, it is not always the easiest code to read and interpret.
 
 A common package that people use to perform data science in R is `tidyverse`. The `tidyverse` package includes functions that are designed to be more intuitive for doing data cleaning, visualization, and analysis.
 
@@ -73,10 +73,10 @@ Now we have installed and loaded tidyverse, we can use its `select` function to 
 In Part 2 we learned to read in a .csv file and assign it to a data frame called `gap`. Let's do that again. How can you find out what variables we have in our data?
 
 ```{r}
+gap <- read_csv("../data/gapminder.csv")
 
-
-
-
+# extract column names
+names(gap)
 ```
 
 Next we can look up the help files for the `select()` function from tidyverse.
@@ -93,20 +93,18 @@ select(gap, year, pop, lifeExp)
 gap_subset <- select(gap, year, pop, lifeExp)
 dim(gap_subset)
 head(gap_subset)
-
 ```
 
 💡 **Tip:** If you want to learn how to use tidyverse in more detail, you can check out D-Lab's [R Data Wrangling and Manipulation](https://github.com/dlab-berkeley/R-Data-Wrangling) workshop series.
 
 ### 🥊 Challenge 2: Select Columns using Tidyverse
 
-Use the `select()` function from `tidyverse` to select three variables from the gap data frame. Assign those three variables to a new data frame. Check the dimensions of your new data frame using the `dim()` function.
+Use the `select()` function from `tidyverse` to select three variables from the gap data frame. Assign those three variables to a new data frame. Check the dimensions of your new data frame using the `dim()` function
 
 ```{r}
+new_subset <- select(gap, country, gdpPercap, pop)
 
-
-
-
+dim(new_subset)
 ```
 
 ## Filtering Data Frames
@@ -132,12 +130,20 @@ In order to specify which rows we want to subset, we need to write **conditional
 ```{r}
 # check whether the average population is bigger than 5 million 
 mean(gap$pop) > 5000000
+mean(gap$pop)
 
 # check whether the minimum year is less than or equal to 1950?
 min(gap$year) <= 1950
+min(gap$year)
 
 # check if there are exactly 6 variables in the gap data
 length(names(gap)) == 6
+length(names(gap))
+```
+
+```{r}
+?length
+?names
 ```
 
 ### Filtering
@@ -158,7 +164,7 @@ filter(gap, lifeExp > 80)
 We can also combine conditional statements using the `&` and `|` (or) operators. `&` checks both statements and returns rows that meet **both** conditions. `|` (or) checks both statements and returns rows that meet **either** conditions.
 
 ```{r}
-# return all rows in Asia with a GSP per capita above or equal to 30K
+# return all rows in Asia with a GDP per capita above or equal to 30K
 filter(gap, continent == "Asia" & gdpPercap >= 30000)
 
 # return all rows in Germany or France
@@ -168,6 +174,12 @@ filter(gap, country == "Germany" | country == "France")
 filter(gap, country == "Mexico" & year != 2007)
 ```
 
+```{r}
+# sort ??
+filter(gap, country == "Mexico" & year != 2007) %>%
+  arrange()
+```
+
 ### Piping
 
 We can combine our `select` and `filter` commands to subset both columns and rows. An intuitive way to write code that combines multiple functions is to write multiple lines of code that feed into each other. We do this with the pipe operator `%>%` from `tidyverse`. The `%>%` operator takes the output on the left-hand side and passes it into the function on the right-hand side.
@@ -175,20 +187,22 @@ We can combine our `select` and `filter` commands to subset both columns and row
 ```{r}
 # start with the gap data set
 gap %>%
-  # filter to Mexico - note, we don't need to specify gap inside select() any more
+  # filter to Mexico
+  # note, we don't need to specify gap inside select() any more
   filter(country == "Mexico") %>%
+  
   # select the columns we want to return
   select(country, year, pop, lifeExp) 
-
 ```
 
 We can assign the subset of our original data frame to a new data frame.
 
 ```{r}
-# save Mexico rows to another data frame
+# save Mexico rows (from above exercise) to another data frame
 data_mexico <- gap %>%
   # filter to Mexico
   filter(country == "Mexico") %>%
+  
   # select the columns we want to return
   select(country, year, pop, lifeExp) 
 
@@ -202,9 +216,12 @@ dim(data_mexico)
 Start with the gap data frame. Use the `%>%` operator and the functions `select()` and `filter`. Subset the data to countries in Asia or Oceania that have a life expectancy above 60, and select the country, year, life expectancy, and GDP per capita variables. Assign your subsetted data to a new data frame called **gap_subset**.
 
 ```{r}
+gap_subset <- gap %>%
+  filter(continent == "Asia" | continent == "Oceania") %>%
+  filter(lifeExp > 60) %>%
+  select(country, year, lifeExp, gdpPercap)
 
-
-
+gap_subset
 ```
 
 ## Missing Values
@@ -217,14 +234,15 @@ summary(gap$lifeExp)
 
 # we can also print only the mean value using the mean() function
 mean(gap$lifeExp)
-
 ```
 
 🔔 **Question:** What do you notice when you use the `mean()` and `summary()` functions on `gap$gdpPercap` ?
 
 ```{r}
 # try out mean() and summary() on gdpPercap
+mean(gap$gdpPercap)
 
+summary(gap$gdpPercap)
 ```
 
 When we have missing values, functions may perform differently than expected. It is important to know if and why there are missing values in our data. In R, missing values are represented with `NA`, which stands for "not available" or "not applicable". We can use the `is.na()` function to count how many missing values there are in a variable.
@@ -236,7 +254,10 @@ is.na(gap$gdpPercap) %>%
 
 # we can also get this information from summary()
 summary(gap$gdpPercap)
+```
 
+```{r}
+is.na(gap$gdpPercap)
 ```
 
 When we ran `mean(gap$gdpPercap)`, R returned `NA` because it can't calculate a mean over missing values. We need to tell it to explicitly ignore the missing values and calculate the mean using the non-missing values.
@@ -248,7 +269,7 @@ When we ran `mean(gap$gdpPercap)`, R returned `NA` because it can't calculate a 
 ?mean
 
 # calculate the mean of gdpPercap ignoring missing values 
-mean(gap$gdpPercap, ...) # <- edit this
+mean(gap$gdpPercap, na.rm=TRUE)
 
 # is this the same as using summary?
 summary(gap$gdpPercap)
@@ -265,23 +286,22 @@ Reminder: `filter()` takes a conditional statement, checks if it's true, and the
 ```{r}
 # fill in a conditional statement in filter to keep only rows with non-missing values of gdpPercap
 gap_nomissing <- gap %>%
-  filter(...)
+  filter(!is.na(gdpPercap))
+gap_nomissing
 
-# the code below subtracts the number of rows in gap_nonmiss from number of rows in gap - this is how many rows filter() dropped
-nrow(gap)-nrow(gap_nomissing)
-
+# the code below subtracts the number of rows in gap_nonmiss from number of rows in gap
+# this is how many rows filter() dropped
+nrow(gap) - nrow(gap_nomissing)
 ```
 
 ```{r}
-
 # check if we have any missing values for gdpPercap
 summary(gap_nomissing$gdpPercap)
-
 ```
 
 ⚠️ **Warning:** When dropping missing values, R drops the entire row of data that contained those missing values. This means we lose cells that had non-missing values for other variables. Choosing whether to drop the row entirely or using functions that ignore missing values will depend on what you're trying to do in your data cleaning and analysis.
 
-### 🎬 **Demo:**Reporting Missing Values for all Variables**
+### 🎬 **Demo:**Reporting Missing Values for all Variables\*\*
 
 The code below uses two functions from **tidyverse**, `summarize()` and `pivot_longer()`, to make a table showing the number of missing values in each variable. We learn these functions in D-Lab's [R Data Wrangling](https://github.com/dlab-berkeley/R-Data-Wrangling) workshop, which is a great course to take after R Fundamentals.
 
@@ -313,7 +333,6 @@ What if we try to use them on **character** variables?
 summary(gap$continent)
 
 summary(gap$country)
-
 ```
 
 Instead, we can use the `table()` function to print out a table of all the values that `continent` takes and how many times each value appears (i.e., its frequency).
@@ -334,17 +353,23 @@ table(gap$continent, gap$year)
 
 ⚠️ **Warning:** Not all character variables are categorical: a variable of people's names does not have a limited and known set of values, but it is a character variable. Likewise, not all categorical variables are characters: shoe size is a numeric variable but it has a fixed set of values, so it is a categorical variable.
 
-In R, **categorical** variables are best stored as **factors** because this tells R that the variable can take one of a fixed set of values. This is helpful when performing calculations or making plots. The set of values that a factor variable can take are called **levels**. For the `continent` variable, the levels are Africa, Americas, Asia, Europe, and Oceania.
+In R, **categorical** variables are best stored as **factors** because this tells R that the **variable can take one of a fixed set of values**. This is helpful when performing calculations or making plots. The set of values that a factor variable can take are called **levels**. For the `continent` variable, the levels are Africa, Americas, Asia, Europe, and Oceania.
 
 To convert a variable to a categorical variable, you use the `factor()` function. By default, it will look for all unique values in the variable and set those as the possible levels.
 
 ```{r}
+?factor
+summary(gap$continent)
+```
+
+```{r}
 # convert gap$continent into a factor variable
+# 5 levels: Africa, Americas, Asia, Europe, Oceania
 continent_factor <- factor(gap$continent)
 
 # now we can use summary() on it
+# otherwise, need to call table() on it
 summary(continent_factor)
-
 ```
 
 Factors are useful when it comes to making plots and tables, but we won't spend much time on them now.
@@ -368,7 +393,6 @@ gap %>%
   ylab("GDP per capita (logged)") +
   xlab("Life Expectancy (years)") +
   theme_bw() 
-
 ```
 
 ## Key Points

@@ -42,9 +42,14 @@ library(tidyverse)
 Load in `data/gapminder.csv` using the `read.csv()` function from previous workshops and assign it to the object **gap**.
 
 ```{r}
+getwd()
+gap <- read_csv("../data/gapminder.csv")
+```
 
-
-
+```{r}
+# specify which library to call filter()
+# package::function()
+dplyr::filter(gap, lifeExp > 80)
 ```
 
 ## Visualizing Data
@@ -57,10 +62,9 @@ What is the average life expectancy in our data? How much does life expectancy v
 
 ```{r}
 
-mean(...)
+mean(gap$lifeExp)
 
-summary(...)
-
+summary(gap$lifeExp)
 ```
 
 We can combine our summary statistics functions with the subsetting functions `filter()` and `select()` from `tidyverse` to ask more specific questions. **For example, what is the average life expectancy in Asia?**
@@ -68,10 +72,23 @@ We can combine our summary statistics functions with the subsetting functions `f
 ```{r}
 
 gap_asia <- gap %>%
-  filter(...)
+  filter(continent == "Asia")
 
 summary(gap_asia$lifeExp)
+```
 
+```{r}
+gap_asia <- gap %>%
+  filter(continent == "Asia")
+
+mean(gap_asia$lifeExp)
+```
+
+```{r}
+gap %>% 
+  filter(continent == "Asia") %>% 
+  pull(lifeExp) %>% 
+  mean()
 ```
 
 A great way to ask more involved questions about our data and convey this information is to make a plot!
@@ -81,22 +98,25 @@ A great way to ask more involved questions about our data and convey this inform
 How does the life expectancy compare across continents? Here's a box plot example:
 
 ```{r}
+# ggplot uses "+" to add layers
+gap %>%
+  ggplot(aes(x = continent, y = lifeExp))
+```
 
+```{r}
 gap %>%
   ggplot(aes(x = continent, y = lifeExp)) +
   geom_boxplot(aes(fill = continent)) +
   theme_bw() +
   ylab("Life Expectancy (years)") +
   ggtitle("Life expectancy by continent (1952-2007)")
-
-  
 ```
 
 **🔔 Question:** What are some things we learn from this plot? Put your answer in the chat.
 
 ### ggplot
 
-`ggplot` is a package from `tidyverse` that helps to create highly customizable plots, all of which have the same underlying syntax. 
+`ggplot` is a package from `tidyverse` that helps to create highly customizable plots, all of which have the same underlying syntax.
 
 A `ggplot` is comprised of three fundamental building blocks:
 
@@ -106,7 +126,7 @@ A `ggplot` is comprised of three fundamental building blocks:
 
 3.  **geoms**: what type of plot will represent our data (histogram, scatter plot, bar chart etc.)
 
-One thing to remember is that `ggplot` works in **layers**, similar to photoimaging software such as Photoshop. We create a base layer, and then stack layers on top of that base layer. New layers are added to a plot using the addition symbol `+`. 
+One thing to remember is that `ggplot` works in **layers**, similar to photoimaging software such as Photoshop. We create a base layer, and then stack layers on top of that base layer. New layers are added to a plot using the addition symbol `+`.
 
 ## Box Plots
 
@@ -117,7 +137,6 @@ Here we re-create the box plot from above.
 ```{r}
 
 ggplot(data = gap)
-
 ```
 
 2.  **aesthetics**: Next, we specify which variables we want to visualize and how. Here we want `continent` on the x-axis, `lifeExp` on the y-axis, and `continent` again as the fill color. All aesthetics go inside the `aes()` function. This prepares our canvas.
@@ -150,8 +169,6 @@ ggplot(data = gap, aes(x = continent, y = lifeExp, fill = continent)) +
   theme_bw() +
   # remove the legend, b/c this is redundant
   theme(legend.position = 'none')
-  
-
 ```
 
 ### 🥊 Challenge 3: What Plots?
@@ -177,7 +194,6 @@ gap %>%
   filter(continent == "Oceania") %>%
   ggplot(aes(x = year, y = lifeExp)) +
   geom_point()
-
 ```
 
 🔔 **Question:** Why are there two points in each year?
@@ -197,24 +213,59 @@ gap %>%
 
 gap %>%
   filter(continent == "Oceania") %>%
-  ggplot(aes(x = year, y = lifeExp, color = country)) +
+  ggplot(aes(x = year, y = lifeExp, color = country, shape = country)) +
   geom_point() +
-  # add more layers to make the plot more informative
-  ...
+  geom_smooth(method = 'lm', formula = 'y~x') + 
+  ggtitle("Plot of Life Expectancy Across Australia and New Zealand")
+```
 
+```{r}
+?geom_smooth
 ```
 
 ### 🥊 Challenge 4: Create a Scatter Plot
 
-Create a scatter plot that shows the relationship between `lifeExp` and `gdpPercap` . Start with a "simple" plot using `geom_point()`. 
+Create a scatter plot that shows the relationship between `lifeExp` and `gdpPercap` . Start with a "simple" plot using `geom_point()`.
 
 Next, think about edits you could make to the plot that might make it easier to read. For example, changing the x and y axis, adding a title, coloring the points by a certain grouping, etc.
 
 ```{r}
 
 gap %>%
-  ggplot(...)
+  ggplot(aes(x = gdpPercap, y = lifeExp, color = continent, shape = continent)) + 
+  geom_point() +
+  xlab("GDP Per Capita") +
+  ylab("Life Expectancy") +
+  ggtitle("Plot of GDP Per Capita vs. Life Expectancy")
+```
 
+```{r}
+# facet_wrap separates it into different plots
+gap %>%
+  ggplot(aes(x = gdpPercap, y = lifeExp, color = continent, shape = continent)) + 
+  geom_point() +
+  facet_wrap(~continent) + 
+  xlab("GDP Per Capita") +
+  ylab("Life Expectancy") +
+  ggtitle("Plot of GDP Per Capita vs. Life Expectancy Per Continent")
+```
+
+```{r}
+gap |>
+  ggplot( aes(x = lifeExp, y = log(gdpPercap), size = pop,color = continent)) +
+  geom_point() +
+  facet_wrap(~year)+
+  ggtitle("Life Expectancy vs Gdp Per Cap across Continents")
+```
+
+```{r}
+gap %>%
+  ggplot(aes(x = log(gdpPercap), y = lifeExp, color = continent, shape = continent)) +
+  geom_point() +
+  ggtitle("Relationship between Life Expectancy and GDP per Capita") +
+  xlab("GDP per Capita (logscale)") +
+  ylab("Life Expectancy") +
+  theme_minimal()
 ```
 
 💡 **Tip:** `ggplot` can be used to create many different plots. [Here](https://r-graph-gallery.com/index.html) are some examples with the underlying code. To learn more about using `ggplot` you can take D-Lab's [R Data Visualization](https://github.com/dlab-berkeley/R-Data-Visualization) workshop!
@@ -224,8 +275,7 @@ gap %>%
 Oftentimes, we want to do the same thing over and over again in our code, but with minor changes. For example, we might want to plot the life expectancy against GDP per capita for multiple continents in our data.
 
 ```{r}
-
-# plot gdppercap vs. lifeExp for Oceania 
+# plot gdppercap vs. lifeExp for Oceania
 gap %>%
   filter(continent == "Oceania") %>%
   ggplot(aes(x = gdpPercap, y = lifeExp)) +
@@ -244,7 +294,7 @@ gap %>%
   filter(continent == "Americas") %>%
   ggplot(aes(x = gdpPercap, y = lifeExp)) +
   geom_point() +
-  ggtitle("Life expectancy against GDP per capita in Oceania") +
+  ggtitle("Life expectancy against GDP per capita in Americas") +
   ylab("Life expectancy (years)") +
   xlab("GDP per capita (dollars)") +
   theme_bw()
@@ -260,22 +310,22 @@ The structure of a custom function is:
 
 ```{r}
 # # structure of code
-# function_name <- function(optional arguments){
+# function_name <- function(optional arguments) {
 #   
 #   code
 # 
 # }
+?paste0
+```
 
+```{r}
 # example
-print_number <- function(x){
-  
+print_number <- function(x) {
   paste0("My number is: ", x)
-  
 }
 
 print_number(1)
 print_number(5)
-
 ```
 
 Custom functions in R have four main components:
@@ -293,7 +343,7 @@ Custom functions in R have four main components:
 Here is another example for a custom function that returns the average life expectancy of each continent.
 
 ```{r}
-continent_lifeexp <- function(cont){
+continent_lifeexp <- function(cont) {
   
   # it is good practice to comment what the function does and what its arguments are at the top:
   # function to return life expectancy of continent
@@ -309,9 +359,7 @@ continent_lifeexp <- function(cont){
   
   # return the life expectancy
   return(paste0("The average life expectancy in ", cont, " is ", lifeexp_mean))
-    
 }
-
 ```
 
 Note that running this chunk of code does not run the code inside the function! It saves a function called `continent_lifeexp()`, which now appears in our global environment and can be called at any time in our session.
@@ -329,12 +377,34 @@ Write a function that filters the gap data set to a specific year. Then estimate
 💡 **Tip:** When writing functions, it is helpful to make sure the body of the code does what you want it to without throwing any errors before including it in the function. To do this, first write the code as you normally would outside of a function. Check it works, then replace any values with the arguments that you use in the function!
 
 ```{r}
+gap_2007 <- gap %>%
+  filter(year == 2007)
 
+gdpPercap_2007 <- mean(gap_2007$gdpPercap, na.rm = TRUE)
 
+paste("The average GDP per capita in 2007", "is", gdpPercap_2007)
+```
 
+```{r}
+gdpPercap_by_year <- function(yr) {
+  gap_year <- gap %>%
+    filter(year == yr)
+  gdpPercap_year <- mean(gap_year$gdpPercap, na.rm=TRUE)
+  
+  return(paste("The average GDP per capita in", yr, "is", gdpPercap_year))
+}
 
+gdpPercap_by_year(2007)
+```
 
+```{r}
+gdpPercap_by_year <- function(data, yr) { 
+  gap_year <- filter(data, year == yr)
+  mean_gdp <- mean(gap_year$gdpPercap, na.rm = TRUE)
+  return(paste("The average GDP per capita in", yr, "is", mean_gdp))
+}
 
+gdpPercap_by_year(gap, 2007)
 ```
 
 ### Functions with ggplot
@@ -342,7 +412,6 @@ Write a function that filters the gap data set to a specific year. Then estimate
 Returning to our example, we can create a function that takes the name of the continent as an argument and outputs a plot of life expectancy against GDP for each continent.
 
 ```{r}
-
 gdp_lifeexp_plot <- function(cont){
   
   # function plot life expectancy against GDP per capita by continent 
@@ -361,9 +430,7 @@ gdp_lifeexp_plot <- function(cont){
   
   # return the plot so it prints out when we call the function
   return(p)
-  
 }
-
 ```
 
 Now we have a function called `gdp_lifexp_plot()` in our global environment. We can call it at any time and provide different continent names.
@@ -372,7 +439,6 @@ Now we have a function called `gdp_lifexp_plot()` in our global environment. We 
 
 gdp_lifeexp_plot("Africa")
 gdp_lifeexp_plot("Europe")
-
 ```
 
 Functions are a great tool for improving your code, especially when you find yourself copying and pasting code. To read more about functions we recommend the [Functions chapter in R for Data Science](https://r4ds.hadley.nz/functions.html).

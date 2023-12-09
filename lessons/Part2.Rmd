@@ -47,17 +47,16 @@ pop_mexico*10
 
 # add 2 to each element
 pop_mexico + 2
-
 ```
 
-### 🥊 Challenge 1: Manipulating vVectors
+### 🥊 Challenge 1: Manipulating Vectors
 
 The code above didn't permanently change the values in our population vector. Re-write the code above so that the population vector is an additional 2 (million) people in each year.
 
 ```{r}
 
-
-
+pop_mexico <- pop_mexico + 2
+pop_mexico
 ```
 
 ## Functions
@@ -78,14 +77,12 @@ Functions are commands that take an input and return some output. They are ident
 
 ```{r}
 length(pop_mexico)
-
 ```
 
 ⚠️ **Warning:** Not all functions have inputs or arguments - for example, the `ls()` function doesn't require an input but still gives us an output.
 
 ```{r}
 ls()
-
 ```
 
 We can modify functions by changing the **arguments** in the function. The function `seq()` has several arguments, which we can look at on the help page.
@@ -93,8 +90,6 @@ We can modify functions by changing the **arguments** in the function. The funct
 ```{r}
 # look up what the seq() functions does and what arguments it uses
 ?seq
-
-
 ```
 
 📝 **Poll RFun 2-1:** Looking at the `seq()` help page, which code is correct for creating a vector with the years 2018 to 2022? Try the code out in the poll below and answer in the Zoom poll.
@@ -105,8 +100,16 @@ We can modify functions by changing the **arguments** in the function. The funct
 years <- c(2018, 2019, 2020, 2021, 2022)
 
 # try using seq() to create the same vector as above, called years_v2
-years_v2 <- ...
+years_v2 <- seq(from=2018, to=2022)
 
+# default increment is 1
+seq(from=2018, to=2022, by=1)
+
+# length should be 5, default increment is 1
+seq(from=2018, to=2022, length.out=5)
+
+# length same as length of `years`, default increment is 1
+seq(from=2018, to=2022, along.with=years)
 ```
 
 ```{r}
@@ -119,7 +122,14 @@ A third way to create a vector is using the `:` operator (colon operator).
 
 ```{r}
 years_v3 <- c(2018:2022)
+```
 
+```{r}
+# `:` works for increment of -1
+c(2022:2018)
+
+# same as seq(from=??, to=??)
+?colon
 ```
 
 💡 **Tip:** It's okay to try out functions and operators and get things wrong! Interpreting error messages and debugging code is the bread and butter of coding.
@@ -149,14 +159,13 @@ You can create a data frame in R and fill it with values. Normally though, you *
 ```{r}
 # import csv file 
 gap <- read.csv("gapminder.csv")
-
 ```
 
 🔔 **Question:** The code above returned an error - why do you think this is?
 
 When we read in data, we need to specify the **relative file path**. This means, from our **current working directory**, navigating our file structure to get to the file we want to import.
 
-Imagine the file path on your computer as the exact address to a specific room in a sprawling mansion. The mansion has multiple floors, each with a variety of rooms: bedrooms, kitchens, and libraries. To find your way to a specific room, you would start at the front entrance (the root directory), then move up staircases or down hallways (subdirectories) until you reach your destination. 
+Imagine the file path on your computer as the exact address to a specific room in a sprawling mansion. The mansion has multiple floors, each with a variety of rooms: bedrooms, kitchens, and libraries. To find your way to a specific room, you would start at the front entrance (the root directory), then move up staircases or down hallways (subdirectories) until you reach your destination.
 
 Just as you might give a friend detailed instructions like "enter the mansion, go up to the second floor, turn left, take the third door on the right," a file path provides the computer with precise directions to locate a specific file amid thousands of other files. This way, the computer knows exactly where to go to find what you're looking for.
 
@@ -168,7 +177,6 @@ getwd()
 
 # read in gap data using a relative file path
 gap <- read.csv("../data/gapminder.csv")
-
 ```
 
 💡 **Tip:** Within a file path, a period "." means "in this directory". A double period ".." means "go back one directory".
@@ -179,7 +187,18 @@ After importing data, the first thing to check is if the data looks like you exp
 
 ```{r}
 # examine our data
+?head
+
+# head shows top 6 rows
 head(gap)
+```
+
+```{r}
+head(gap, n=2)
+```
+
+```{r}
+tail(gap, n=3)
 ```
 
 ### 🥊 Challenge 3: Import a csv file and explore the data
@@ -188,26 +207,29 @@ Clear the global environment (hint: if you can't remember the function to do thi
 
 Then use the functions `head()`, `dim()`, and `View()` (note the capital V) to answer the following questions:
 
-1.  How many variables are there?
+1.  How many variables are there? 6 cols
 
-2.  How many observations are there?
+2.  How many observations are there? 1704 rows
 
-3.  What information is in this data?
+3.  What information is in this data? Population, life expectancy, GDP per capita
 
 ```{r}
 # clear the global environment
-
-
+rm(list=ls())
 
 # read in the gapminder data and save as an object called "gap"
-
-
+gap <- read.csv("../data/gapminder.csv")
 
 # use the functions head(), dim(), and View() 
 # eg. head(gap)
+head(gap)
 
+# dimension returns # rows, # cols
+dim(gap)
 
-
+# display full dataframe in new window
+# similar to clicking on `gap` in environment
+View(gap)
 ```
 
 💡 **Tip:** Oftentimes, different file types have different functions for importing them. To import a specific file type, you can Google or ask ChatGPT what package and function is needed. E.g., packages for less common file types are `foreign` and `haven`.
@@ -217,7 +239,7 @@ Then use the functions `head()`, `dim()`, and `View()` (note the capital V) to a
 When we created variables in Part 1, we said that all the values in the variable needed to be the same type or **class**. Let's explore the variables in the gap data frame a bit more. We can select individual variables using the `$` operator.
 
 ```{r}
-# select population 
+# select population
 gap$pop
 
 # if you type gap$ it will show you a list of variables
@@ -256,15 +278,21 @@ Overall, there are five classes of data in R:
 
 5.  **factor**: nominal or ordinal categorical type
 
-⚠️ **Warning:**  We have learned the first three classes. We will encounter **logicals** and **factors** later in the series.
+⚠️ **Warning:** We have learned the first three classes. We will encounter **logicals** and **factors** later in the series.
 
 📝 **Poll RFun 2-3**: Use the function `class()` on each of the following variables and match them with their class: `continent`, `lifeExp`, `gdpPercap`, `year`
 
 ```{r}
 
-class(...)
+class(gap$continent)
+class(gap$lifeExp)
+class(gap$gdpPercap)
+class(gap$year)
+```
 
-
+```{r}
+# same as <??> in head
+head(gap, n=1)
 ```
 
 ## Subsetting Data Frames
@@ -290,20 +318,38 @@ Because data frames are two-dimensional, we can specify the rows and the columns
 To extract a single variable, we specify the variable name withing the square brackets. This returns all the rows but only one column.
 
 ```{r}
-# extract a single variable using the indexing method 
+# 1 col: extract a single variable using the indexing method 
 gap["pop"]
+```
 
+```{r}
+# $ method returns vector 
+# appears under Environment `Values`
+# choose 1 col
+pop_v1 <- gap$pop
+pop_v1
+
+# indexing method returns df
+# appears under Environment `Data`
+# choose mutliple rows, cols
+pop_v2 <- gap["pop"]
+pop_v2
 ```
 
 We can index **multiple** columns. This is done by providing a vector of variable names inside the square brackets.
 
 ```{r}
-# extract multiple variables using the indexing method
+# multiple cols: extract multiple variables using the indexing method
 gap[c("pop", "year")]
 
 # we can also define the vector of names first
 variables <- c("pop" , "year", "lifeExp")
 gap[variables]
+```
+
+```{r}
+# extract column names
+names(gap)
 ```
 
 ### 🥊 Challenge 4: Subsetting Columns
@@ -312,9 +358,20 @@ Extract three variables of your choice from the gap data frame. Think back to Pa
 
 ```{r}
 
+gap_subset_1 <- gap[c("country", "year", "pop")]
+gap_subset_1
+```
 
+```{r}
+# index first 5 rows, 2 cols
+gap_subset_2 <- gap[1:5, c("country", "year")]
+gap_subset_2
+```
 
-
+```{r}
+# $ method to select cols, then create df to organize the cols
+gap_subset <- data.frame(gap$country, gap$pop, gap$year)
+head(gap_subset)
 ```
 
 ## 🎬 **Demo:** Next Time...
@@ -324,10 +381,14 @@ Besides subsetting columns, we can subset rows. To do this, we use **conditional
 🔔 **Question:** Run the chunk of code below. What do you think we are doing?
 
 ```{r}
+# use tidyverse for conditional selection
+library(tidyverse)
+```
+
+```{r}
 gap %>%
   filter(year == 2007 | year == 1952) %>%
   select(gdpPercap, lifeExp, continent, year) 
-
 ```
 
 ## Key Points
